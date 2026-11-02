@@ -1,4 +1,4 @@
--- Aplicada no projeto Supabase "SITE ADV" (wywrpedxqoelvsolwvxm) em 02/11/2026.
+-- Aplicada no projeto Supabase "JOVEM ADV" (tgosadjncwlbdcbiixsj) em 02/11/2026.
 -- A chave do conteúdo (tabela chave_conteudo) foi inserida à parte e NÃO fica no repositório.
 
 create table public.assinaturas (
@@ -35,7 +35,10 @@ create table public.chave_conteudo (
   ativa   boolean not null default true
 );
 
-create or replace function public.tem_acesso()
+create schema if not exists privado;
+grant usage on schema privado to authenticated;
+
+create or replace function privado.tem_acesso()
 returns boolean language sql stable security definer set search_path = '' as $$
   select exists (
     select 1 from public.assinaturas a
@@ -44,8 +47,8 @@ returns boolean language sql stable security definer set search_path = '' as $$
            or (a.status = 'cancelada' and a.acesso_ate is not null and a.acesso_ate > now()))
   );
 $$;
-revoke execute on function public.tem_acesso() from public, anon;
-grant execute on function public.tem_acesso() to authenticated;
+revoke execute on function privado.tem_acesso() from public, anon;
+grant execute on function privado.tem_acesso() to authenticated;
 
 alter table public.assinaturas     enable row level security;
 alter table public.eventos_hotmart enable row level security;
@@ -61,28 +64,9 @@ create policy "aluno cria o proprio progresso" on public.progresso
 create policy "aluno atualiza o proprio progresso" on public.progresso
   for update to authenticated using (user_id = (select auth.uid())) with check (user_id = (select auth.uid()));
 create policy "assinante le a chave" on public.chave_conteudo
-  for select to authenticated using (ativa and public.tem_acesso());
+  for select to authenticated using (ativa and privado.tem_acesso());
 
 grant select on public.assinaturas, public.chave_conteudo to authenticated;
 grant select, insert, update on public.progresso to authenticated;
 revoke all on public.assinaturas, public.eventos_hotmart, public.progresso, public.chave_conteudo from anon;
 revoke all on public.eventos_hotmart from authenticated;
-
--- 2ª migração (mesmo dia): função de acesso movida para um schema fora da API pública
-create schema if not exists privado;
-grant usage on schema privado to authenticated;
-create or replace function privado.tem_acesso()
-returns boolean language sql stable security definer set search_path = '' as $$
-  select exists (
-    select 1 from public.assinaturas a
-    where a.email = lower(coalesce(auth.jwt() ->> 'email', ''))
-      and (a.status in ('ativa','cortesia')
-           or (a.status = 'cancelada' and a.acesso_ate is not null and a.acesso_ate > now()))
-  );
-$$;
-revoke execute on function privado.tem_acesso() from public, anon;
-grant execute on function privado.tem_acesso() to authenticated;
-drop policy "assinante le a chave" on public.chave_conteudo;
-create policy "assinante le a chave" on public.chave_conteudo
-  for select to authenticated using (ativa and privado.tem_acesso());
-drop function public.tem_acesso();

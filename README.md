@@ -8,7 +8,7 @@ Plataforma de temporadas e episódios de prática jurídica para o jovem advogad
 | --- | --- |
 | Plataforma (login e área do aluno) | https://advjuliovicente.github.io/JOVEM-ADV/ |
 | Página de vendas para anúncios (VSL + checkout) | https://advjuliovicente.github.io/JOVEM-ADV/assinar/ |
-| Webhook da Hotmart | https://wywrpedxqoelvsolwvxm.supabase.co/functions/v1/hotmart-webhook |
+| Webhook da Hotmart | https://tgosadjncwlbdcbiixsj.supabase.co/functions/v1/hotmart-webhook |
 
 Cada `git push` na branch `main` publica o site automaticamente (`.github/workflows/pages.yml`).
 
@@ -51,7 +51,7 @@ O conteúdo das temporadas fica criptografado em `conteudo.enc`. A chave está n
 - `SITE_URL` (opcional): troque quando tiver domínio próprio.
 
 ### Hotmart › Ferramentas › Webhook
-- URL: `https://wywrpedxqoelvsolwvxm.supabase.co/functions/v1/hotmart-webhook`
+- URL: `https://tgosadjncwlbdcbiixsj.supabase.co/functions/v1/hotmart-webhook`
 - Versão: **2.0.0**
 - Eventos: compra aprovada, completa, cancelada, reembolsada, chargeback, protesto, atrasada, expirada e cancelamento de assinatura.
 
