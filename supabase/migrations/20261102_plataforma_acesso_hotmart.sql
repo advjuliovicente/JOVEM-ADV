@@ -67,3 +67,22 @@ grant select on public.assinaturas, public.chave_conteudo to authenticated;
 grant select, insert, update on public.progresso to authenticated;
 revoke all on public.assinaturas, public.eventos_hotmart, public.progresso, public.chave_conteudo from anon;
 revoke all on public.eventos_hotmart from authenticated;
+
+-- 2ª migração (mesmo dia): função de acesso movida para um schema fora da API pública
+create schema if not exists privado;
+grant usage on schema privado to authenticated;
+create or replace function privado.tem_acesso()
+returns boolean language sql stable security definer set search_path = '' as $$
+  select exists (
+    select 1 from public.assinaturas a
+    where a.email = lower(coalesce(auth.jwt() ->> 'email', ''))
+      and (a.status in ('ativa','cortesia')
+           or (a.status = 'cancelada' and a.acesso_ate is not null and a.acesso_ate > now()))
+  );
+$$;
+revoke execute on function privado.tem_acesso() from public, anon;
+grant execute on function privado.tem_acesso() to authenticated;
+drop policy "assinante le a chave" on public.chave_conteudo;
+create policy "assinante le a chave" on public.chave_conteudo
+  for select to authenticated using (ativa and privado.tem_acesso());
+drop function public.tem_acesso();
