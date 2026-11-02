@@ -1,45 +1,109 @@
 # Advocacia Smart · Netflix Jurídica
 
-Plataforma de temporadas e episódios de prática jurídica para o jovem advogado, criada por Julio Vicente (@advocaciasmart_).
+Plataforma de temporadas e episódios de prática jurídica para o jovem advogado, criada por Julio Vicente (@advocaciasmart_). O acesso é exclusivo para quem assina pela Hotmart.
 
 ## Endereços
 
 | Página | Endereço padrão (GitHub Pages) |
 | --- | --- |
-| Plataforma (catálogo, login, área do aluno) | https://advjuliovicente.github.io/JOVEM-ADV/ |
+| Plataforma (login e área do aluno) | https://advjuliovicente.github.io/JOVEM-ADV/ |
 | Página de vendas para anúncios (VSL + checkout) | https://advjuliovicente.github.io/JOVEM-ADV/assinar/ |
+| Webhook da Hotmart | https://wywrpedxqoelvsolwvxm.supabase.co/functions/v1/hotmart-webhook |
 
-Cada `git push` na branch `main` publica o site automaticamente (workflow em `.github/workflows/pages.yml`).
+Cada `git push` na branch `main` publica o site automaticamente (`.github/workflows/pages.yml`).
+
+## Como o acesso funciona
+
+1. A pessoa compra na Hotmart.
+2. A Hotmart chama o webhook. A função `hotmart-webhook` grava o e-mail na tabela `assinaturas` com status `ativa` e envia um convite por e-mail.
+3. A pessoa clica no link do e-mail, cria a senha e entra.
+4. Depois, ela entra com e-mail e senha. Se esquecer a senha, usa "Primeiro acesso ou esqueci a senha".
+5. Cancelamento: o acesso continua até o fim do período pago. Reembolso, chargeback, pagamento atrasado ou expirado: o acesso é bloqueado na hora. Um novo pagamento aprovado libera de novo.
+
+O conteúdo das temporadas fica criptografado em `conteudo.enc`. A chave está no Supabase e só é entregue a quem tem assinatura válida, então não adianta abrir o código-fonte da página.
+
+### Status da tabela `assinaturas`
+
+| Status | Tem acesso? | Vem do evento da Hotmart |
+| --- | --- | --- |
+| `ativa` | Sim | PURCHASE_APPROVED, PURCHASE_COMPLETE |
+| `cortesia` | Sim | Manual (liberação gratuita; o webhook nunca altera) |
+| `cancelada` | Até a data em `acesso_ate` | SUBSCRIPTION_CANCELLATION, PURCHASE_CANCELED |
+| `atrasada` | Não | PURCHASE_DELAYED |
+| `reembolsada` | Não | PURCHASE_REFUNDED |
+| `chargeback` | Não | PURCHASE_CHARGEBACK, PURCHASE_PROTEST |
+| `expirada` | Não | PURCHASE_EXPIRED |
+
+**Liberar acesso manual** (você mesmo, parceiros, testes): no Supabase, abra **Table Editor → assinaturas → Insert row**, preencha `email` (minúsculo) e `status` = `cortesia`. Depois, em **Authentication → Users → Invite user**, convide o mesmo e-mail.
+
+## Configuração (uma vez)
+
+### Supabase › Authentication
+- **Sign In / Providers → Email:** desligue **Allow new users to sign up**. Só quem a Hotmart cadastra entra.
+- **URL Configuration → Site URL:** `https://advjuliovicente.github.io/JOVEM-ADV/`
+- **URL Configuration → Redirect URLs:** adicione `https://advjuliovicente.github.io/JOVEM-ADV/**`
+- **Emails → SMTP Settings:** configure um SMTP próprio (Resend, Brevo, Amazon SES...). O envio padrão do Supabase só manda e-mail para membros da sua equipe e tem limite de poucos por hora: sem SMTP próprio, os compradores não recebem o convite.
+- **Emails → Templates:** traduza "Invite user" e "Reset password" (sugestões abaixo).
+
+### Supabase › Edge Functions › Secrets
+- `HOTMART_HOTTOK` (obrigatório): o token da Hotmart em **Ferramentas → Webhook → Autenticação**.
+- `HOTMART_PRODUCT_ID` (opcional): ID do produto; eventos de outros produtos são ignorados.
+- `SITE_URL` (opcional): troque quando tiver domínio próprio.
+
+### Hotmart › Ferramentas › Webhook
+- URL: `https://wywrpedxqoelvsolwvxm.supabase.co/functions/v1/hotmart-webhook`
+- Versão: **2.0.0**
+- Eventos: compra aprovada, completa, cancelada, reembolsada, chargeback, protesto, atrasada, expirada e cancelamento de assinatura.
+
+### Página de vendas
+Em `assinar/index.html`, no bloco `CONFIGURAÇÃO`:
+
+```js
+const CHECKOUT_URL = "https://pay.hotmart.com/SEU-CODIGO";
+const VSL_URL = "https://player.vimeo.com/video/123456";
+```
+
+## Modelos de e-mail sugeridos
+
+**Invite user** · Assunto: `Seu acesso à Advocacia Smart chegou`
+
+```html
+<h2>Compra confirmada!</h2>
+<p>Clique no botão abaixo para criar sua senha e começar a Temporada 1.</p>
+<p><a href="{{ .ConfirmationURL }}">Criar minha senha</a></p>
+<p>Depois, entre sempre com este e-mail ({{ .Email }}) e a senha que você criou.</p>
+```
+
+**Reset password** · Assunto: `Seu link de acesso à Advocacia Smart`
+
+```html
+<h2>Criar ou trocar sua senha</h2>
+<p><a href="{{ .ConfirmationURL }}">Definir minha senha</a></p>
+<p>Se você não pediu este e-mail, pode ignorá-lo.</p>
+```
 
 ## Estrutura
 
 ```
-index.html          Plataforma completa (página pública, login e área do aluno)
-assinar/index.html  Página de vendas de R$ 24,90/mês
-404.html            Página de erro no visual da marca
-.github/workflows/  Publicação automática no GitHub Pages
+index.html                      Plataforma: login, área do aluno e player
+conteudo.enc                    Temporadas criptografadas (AES-GCM)
+assinar/index.html              Página de vendas de R$ 24,90/mês
+404.html                        Página de erro no visual da marca
+supabase/functions/hotmart-webhook/   Função que recebe a Hotmart
+supabase/migrations/            Tabelas e regras de acesso do banco
+.github/workflows/pages.yml     Publicação automática
 ```
 
-## Configurar a página de vendas
+## Editar o conteúdo das temporadas
 
-Abra `assinar/index.html`, procure o bloco `CONFIGURAÇÃO` no início do `<script>` e preencha:
+O texto das temporadas não fica legível no repositório. Para alterar episódios ou questões, peça ao Claude para regenerar o `conteudo.enc`: ele descriptografa com a chave do Supabase, aplica a mudança e criptografa de novo.
 
-```js
-const CHECKOUT_URL = "https://pay.kiwify.com.br/SEU-CODIGO"; // link do checkout (Kiwify, Hotmart...)
-const VSL_URL = "https://player.vimeo.com/video/123456";     // link de incorporação do vídeo ou .mp4
-```
-
-Os parâmetros do anúncio (`utm_source`, `fbclid` etc.) são repassados para o checkout automaticamente.
-
-## Usar um domínio próprio depois
+## Domínio próprio depois
 
 1. Compre o domínio (ex.: `advocaciasmart.com.br` no Registro.br).
-2. No provedor de DNS, crie um registro `CNAME` de `www` apontando para `advjuliovicente.github.io`.
-3. No GitHub: **Settings → Pages → Custom domain**, digite `www.seudominio.com.br` e marque **Enforce HTTPS**.
-
-## Limite atual do login
-
-O login é de demonstração: as contas e o progresso ficam salvos só no navegador de cada aluno (`localStorage`). Qualquer pessoa consegue criar uma conta sem pagar. Para vender acesso de verdade, o próximo passo é ligar o login a um serviço de autenticação (Supabase ou Firebase, por exemplo) ou usar a área de membros da plataforma de checkout.
+2. No DNS, crie um `CNAME` de `www` apontando para `advjuliovicente.github.io`.
+3. GitHub: **Settings → Pages → Custom domain** e marque **Enforce HTTPS**.
+4. Atualize no Supabase a Site URL, as Redirect URLs e o segredo `SITE_URL`.
 
 ---
 
