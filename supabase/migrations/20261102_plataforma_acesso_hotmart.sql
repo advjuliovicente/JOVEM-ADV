@@ -70,3 +70,36 @@ grant select on public.assinaturas, public.chave_conteudo to authenticated;
 grant select, insert, update on public.progresso to authenticated;
 revoke all on public.assinaturas, public.eventos_hotmart, public.progresso, public.chave_conteudo from anon;
 revoke all on public.eventos_hotmart from authenticated;
+
+-- Ordem dos eventos: um evento mais antigo (creation_date) nunca sobrescreve um mais novo
+alter table public.assinaturas add column if not exists evento_em timestamptz;
+alter table public.eventos_hotmart add column if not exists resultado jsonb;
+
+create or replace function public.aplicar_evento_hotmart(
+  p_email text, p_status text, p_evento text, p_evento_em timestamptz,
+  p_nome text, p_produto text, p_transacao text, p_assinante text,
+  p_define_acesso boolean, p_acesso_ate timestamptz
+) returns text
+language plpgsql security definer set search_path = '' as $$
+declare r text;
+begin
+  insert into public.assinaturas as a
+    (email, nome, status, acesso_ate, hotmart_transacao, hotmart_assinante, hotmart_produto, ultimo_evento, evento_em, atualizado_em)
+  values
+    (p_email, p_nome, p_status, case when p_define_acesso then p_acesso_ate end, p_transacao, p_assinante, p_produto, p_evento, p_evento_em, now())
+  on conflict (email) do update set
+    status            = case when a.status = 'cortesia' then 'cortesia' else excluded.status end,
+    acesso_ate        = case when p_define_acesso then p_acesso_ate else a.acesso_ate end,
+    nome              = coalesce(excluded.nome, a.nome),
+    hotmart_transacao = coalesce(excluded.hotmart_transacao, a.hotmart_transacao),
+    hotmart_assinante = coalesce(excluded.hotmart_assinante, a.hotmart_assinante),
+    hotmart_produto   = coalesce(excluded.hotmart_produto, a.hotmart_produto),
+    ultimo_evento     = excluded.ultimo_evento,
+    evento_em         = excluded.evento_em,
+    atualizado_em     = now()
+  where a.evento_em is null or excluded.evento_em >= a.evento_em
+  returning a.status into r;
+  return r;
+end $$;
+revoke execute on function public.aplicar_evento_hotmart(text,text,text,timestamptz,text,text,text,text,boolean,timestamptz) from public, anon, authenticated;
+grant execute on function public.aplicar_evento_hotmart(text,text,text,timestamptz,text,text,text,text,boolean,timestamptz) to service_role;

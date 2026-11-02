@@ -76,44 +76,46 @@ Deno.serve(async (req) => {
   const nome = data?.buyer?.name || data?.subscriber?.name || data?.user?.name || null;
   const produto = String(data?.product?.id || data?.subscription?.product?.id || "");
 
-  const registrar = () => admin.from("eventos_hotmart").insert({ id, evento, email: email || null, payload: body });
+  const registrar = (resultado: Record<string, unknown>) =>
+    admin.from("eventos_hotmart").insert({ id, evento, email: email || null, payload: body, resultado });
 
   if (PRODUCT_ID && produto && produto !== PRODUCT_ID) {
-    await registrar();
+    await registrar({ ignorado: "outro produto" });
     return json({ ok: true, ignorado: "outro produto" });
   }
 
   const novo = STATUS[evento];
   if (!novo || !email) {
-    await registrar();
-    return json({ ok: true, ignorado: novo ? "sem e-mail" : "evento sem efeito no acesso" });
+    const motivo = novo ? "sem e-mail" : "evento sem efeito no acesso";
+    await registrar({ ignorado: motivo });
+    return json({ ok: true, ignorado: motivo });
   }
 
-  const { data: atual } = await admin.from("assinaturas").select("status").eq("email", email).maybeSingle();
+  // data do evento na Hotmart: um evento mais antigo nunca sobrescreve um mais novo
+  const eventoEm = toDate(body?.creation_date) ?? new Date().toISOString();
+  const cancelouAssinatura = evento === "SUBSCRIPTION_CANCELLATION";
 
-  const linha: Record<string, unknown> = {
-    email,
-    status: atual?.status === "cortesia" ? "cortesia" : novo, // cortesia manual nunca é sobrescrita
-    ultimo_evento: evento,
-    atualizado_em: new Date().toISOString(),
-  };
-  if (nome) linha.nome = nome;
-  if (produto) linha.hotmart_produto = produto;
-  if (data?.purchase?.transaction) linha.hotmart_transacao = data.purchase.transaction;
-  const assinante = data?.subscription?.subscriber?.code || data?.subscriber?.code;
-  if (assinante) linha.hotmart_assinante = assinante;
-
-  if (evento === "SUBSCRIPTION_CANCELLATION") {
-    // cancelou: mantém o acesso até o fim do período já pago
-    linha.acesso_ate = toDate(data?.date_next_charge) ?? toDate(data?.subscription?.date_next_charge);
-  } else if (novo === "ativa") {
-    linha.acesso_ate = null;
-  } else if (novo !== "cancelada") {
-    linha.acesso_ate = null;
-  }
-
-  const { error: upErr } = await admin.from("assinaturas").upsert(linha, { onConflict: "email" });
+  const { data: aplicado, error: upErr } = await admin.rpc("aplicar_evento_hotmart", {
+    p_email: email,
+    p_status: novo,
+    p_evento: evento,
+    p_evento_em: eventoEm,
+    p_nome: nome,
+    p_produto: produto || null,
+    p_transacao: data?.purchase?.transaction || null,
+    p_assinante: data?.subscription?.subscriber?.code || data?.subscriber?.code || null,
+    // cancelamento: acesso até o fim do período pago; PURCHASE_CANCELED mantém a data que já existir; demais zeram
+    p_define_acesso: evento !== "PURCHASE_CANCELED",
+    p_acesso_ate: cancelouAssinatura
+      ? toDate(data?.date_next_charge) ?? toDate(data?.subscription?.date_next_charge)
+      : null,
+  });
   if (upErr) return json({ erro: "Falha ao gravar assinatura", detalhe: upErr.message }, 500);
+
+  if (aplicado === null) {
+    await registrar({ ignorado: "evento mais antigo que o status atual" });
+    return json({ ok: true, ignorado: "evento mais antigo que o status atual" });
+  }
 
   // compra aprovada: cria a conta e envia o e-mail para o aluno definir a senha
   let convite = "nao_necessario";
@@ -127,6 +129,6 @@ Deno.serve(async (req) => {
     else convite = "falhou: " + invErr.message;
   }
 
-  await registrar();
-  return json({ ok: true, email, status: linha.status, convite });
+  await registrar({ status: aplicado, convite });
+  return json({ ok: true, email, status: aplicado, convite });
 });
