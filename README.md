@@ -94,6 +94,12 @@ supabase/migrations/            Tabelas e regras de acesso do banco
 .github/workflows/pages.yml     Publicação automática
 ```
 
+## Biblioteca de materiais
+
+A aba **Materiais** da plataforma traz modelos e conteúdos prontos (contrato de honorários, procuração, petições, planilha, artes e roteiros). Os materiais ficam dentro do `conteudo.enc`, junto com as temporadas, e só aparecem para quem tem assinatura válida.
+
+Cada material tem `status: "ok"` (pronto, com texto para copiar ou `link` para o arquivo) ou `"breve"` (mostra a prévia e o selo "em breve"). Para publicar um material novo ou terminar um que está "em breve", peça ao Claude para regenerar o `conteudo.enc` com a mudança.
+
 ## Editar o conteúdo das temporadas
 
 O texto das temporadas não fica legível no repositório. Para alterar episódios ou questões, peça ao Claude para regenerar o `conteudo.enc`: ele descriptografa com a chave do Supabase, aplica a mudança e criptografa de novo.

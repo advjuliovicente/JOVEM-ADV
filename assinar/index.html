@@ -270,6 +270,38 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
 .buybar .p small{font-family:var(--body);font-size:12px;color:var(--muted);font-weight:600}
 @media (min-width:861px){.buybar{display:none}}
 
+
+/* biblioteca (bônus) */
+.lib{position:relative;background:var(--surface);border:2px solid var(--green);border-radius:34px;padding:clamp(24px,5vw,56px);overflow:hidden;box-shadow:0 50px 110px -50px rgba(45,245,142,.55)}
+.lib .bonus{position:absolute;top:22px;right:24px;background:var(--yellow);color:var(--paper-ink);font-family:var(--display);font-size:clamp(22px,3vw,34px);text-transform:uppercase;line-height:1;padding:10px 18px;border-radius:999px;transform:rotate(6deg);box-shadow:var(--shadow-sticker);z-index:2}
+.lib-head{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;margin-bottom:34px}
+.lib h2{font-size:clamp(40px,6vw,78px)!important;max-width:12ch}
+.lib .lede{margin-bottom:20px!important}
+.lib-points{list-style:none;padding:0;margin:0 0 24px;display:grid;gap:8px;font-weight:600;font-size:15px}
+.lib-points li::before{content:"✓ ";color:var(--green);font-weight:800}
+.doc{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:22px;padding:24px 24px 0;transform:rotate(2deg);box-shadow:0 30px 60px -30px rgba(0,0,0,.8);max-height:340px;overflow:hidden;font-size:13px;line-height:1.7;min-width:0}
+.doc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:120px;background:linear-gradient(transparent,var(--paper))}
+.doc .dk{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--green-deep);font-weight:700;margin-bottom:10px}
+.doc h4{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:20px;line-height:1.05;margin:0 0 12px}
+.doc p{margin:0 0 10px}
+.doc mark{background:#d6f9e6;color:#0b5c34;border-radius:4px;padding:0 3px;font-weight:600}
+.doc .stk{position:absolute;bottom:18px;right:18px;z-index:2;transform:rotate(-5deg)}
+.mtiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mtile{position:relative;overflow:hidden;border-radius:18px;padding:16px;min-height:178px;display:flex;flex-direction:column;gap:6px;border:2px solid transparent;transition:transform .2s}
+.mtile:hover{transform:translateY(-5px) rotate(-1deg)}
+.mtile .mcat{font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:700;text-transform:uppercase;opacity:.75}
+.mtile b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:20px;line-height:1;text-wrap:balance;position:relative;z-index:1}
+.mtile .mq{font-size:12px;font-weight:700;opacity:.8;position:relative;z-index:1}
+.mtile .mst{margin-top:auto;align-self:flex-start;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:color-mix(in srgb,currentColor 14%,transparent);position:relative;z-index:1}
+.mtile .mst.ok{background:var(--green-ink);color:var(--green)}
+.mtile.v-g .mst.ok{background:var(--paper-ink)}
+.mtile .g{position:absolute;right:-6px;bottom:-30px;font-family:var(--display);font-size:120px;line-height:1;opacity:.15;pointer-events:none}
+.lib-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:28px}
+.lib-foot p{margin:0;color:var(--muted);font-size:13px;max-width:60ch}
+@media (max-width:1000px){.mtiles{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:860px){.lib-head{grid-template-columns:1fr}.lib .bonus{top:16px;right:16px}}
+@media (max-width:560px){.mtiles{grid-template-columns:repeat(2,1fr)}.mtile{min-height:150px}.mtile b{font-size:16px;overflow-wrap:anywhere;hyphens:auto}.lib .bonus{position:static;display:inline-block;margin-bottom:14px;font-size:20px}}
+
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -313,7 +345,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
 
       <div class="hero-cta">
         <a class="btn btn-green btn-xl" data-checkout href="#oferta">Quero assinar por R$ 24,90/mês <span class="arr">→</span></a>
-        <div class="micro"><span>Acesso imediato</span><span>Cancele quando quiser</span><span>7 dias de garantia</span></div>
+        <div class="micro"><span>Acesso imediato</span><span>Biblioteca de modelos inclusa</span><span>Cancele quando quiser</span><span>7 dias de garantia</span></div>
       </div>
     </div>
   </section>
@@ -350,7 +382,52 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
         <div class="stat"><b>7</b><span>temporadas completas</span></div>
         <div class="stat"><b>28</b><span>episódios de prática</span></div>
         <div class="stat"><b>200+</b><span>questões comentadas</span></div>
-        <div class="stat"><b>7</b><span>certificados para conquistar</span></div>
+        <div class="stat"><b>10</b><span>materiais bônus na biblioteca</span></div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="sec gut" id="biblioteca" style="padding-top:0">
+    <div class="wrap">
+      <div class="lib">
+        <span class="bonus">Bônus</span>
+        <div class="lib-head">
+          <div class="min0">
+            <div class="eyebrow">Incluso nos mesmos R$ 24,90</div>
+            <h2>E uma biblioteca de <span class="it">materiais prontos</span></h2>
+            <p class="lede">Além das temporadas, você recebe os modelos e conteúdos que usaria no primeiro mês de escritório e nas redes. Copie, personalize com os seus dados e use.</p>
+            <ul class="lib-points">
+              <li>Contratos e procuração prontos para o primeiro cliente</li>
+              <li>Petições, planilha financeira, artes e roteiros para as redes</li>
+              <li>Cada material ligado ao episódio que ensina o tema</li>
+            </ul>
+            <a class="btn btn-green" data-checkout href="#oferta">Quero a biblioteca e as temporadas <span class="arr">→</span></a>
+          </div>
+          <div class="doc" aria-label="Prévia do modelo de contrato de honorários">
+            <div class="dk">§ DOCUMENTOS · PRÉVIA</div>
+            <h4>Contrato de prestação de serviços advocatícios e de honorários</h4>
+            <p><strong>CONTRATANTE:</strong> <mark>[NOME COMPLETO]</mark>, <mark>[nacionalidade]</mark>, inscrito(a) no CPF sob o nº <mark>[NÚMERO]</mark>…</p>
+            <p><strong>CLÁUSULA 3ª – DOS HONORÁRIOS.</strong> honorários fixos de R$ <mark>[VALOR]</mark> e/ou de êxito de <mark>[PERCENTUAL]</mark>% sobre o proveito econômico obtido…</p>
+            <p><strong>CLÁUSULA 9ª – DO DESTAQUE.</strong> O(A) CONTRATANTE autoriza a dedução dos honorários contratuais dos valores levantados…</p>
+            <span class="stk g">Copie e cole</span>
+          </div>
+        </div>
+        <div class="mtiles">
+          <div class="mtile v-g"><span class="mcat">Documentos</span><b>Modelo de contrato de honorários</b><span class="mq">1 modelo</span><span class="mst ok">Disponível</span><span class="g" aria-hidden="true">§</span></div>
+          <div class="mtile v-p"><span class="mcat">Documentos</span><b>Modelo de procuração</b><span class="mq">1 modelo</span><span class="mst ok">Disponível</span><span class="g" aria-hidden="true">¶</span></div>
+          <div class="mtile v-k"><span class="mcat">Documentos</span><b>Contrato de parceria entre advogados</b><span class="mq">1 modelo</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">&</span></div>
+          <div class="mtile v-y"><span class="mcat">Petições</span><b>Modelos de petições iniciais persuasivas</b><span class="mq">Pacote de modelos</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">⚖︎</span></div>
+          <div class="mtile v-g"><span class="mcat">Gestão</span><b>Planilha de controle financeiro advocatício</b><span class="mq">1 planilha</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">%</span></div>
+          <div class="mtile v-p"><span class="mcat">Marketing</span><b>Dezenas de artes para Instagram</b><span class="mq">Dezenas de artes</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">@</span></div>
+          <div class="mtile v-k"><span class="mcat">Marketing</span><b>25 reels com conteúdo jurídico</b><span class="mq">25 reels</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">▶︎</span></div>
+          <div class="mtile v-y"><span class="mcat">Marketing</span><b>5 posts “Sobre mim”</b><span class="mq">5 posts</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✶</span></div>
+          <div class="mtile v-g"><span class="mcat">Marketing</span><b>25 posts motivacionais</b><span class="mq">25 posts</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✺</span></div>
+          <div class="mtile v-k"><span class="mcat">Marketing</span><b>25 roteiros de vídeo com CTA</b><span class="mq">25 roteiros</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✎</span></div>
+        </div>
+        <div class="lib-foot">
+          <p>Os itens marcados como disponível já estão na plataforma. Os demais entram na biblioteca ao longo da assinatura, sem custo adicional.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -407,13 +484,14 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
       <div class="center">
         <div class="eyebrow">A oferta</div>
         <h2>Tudo liberado por menos que <span class="it">um almoço</span></h2>
-        <p class="lede">Uma assinatura, o catálogo inteiro e todos os episódios lançados enquanto você for assinante.</p>
+        <p class="lede">Uma assinatura, o catálogo inteiro, a biblioteca de materiais e todos os episódios lançados enquanto você for assinante.</p>
       </div>
       <div class="offer">
         <div class="stack">
           <h3>O que você recebe</h3>
           <ul>
             <li><div><b>As 7 temporadas completas</b><span>Do Diploma à OAB Ativa até Mentalidade & Carreira</span></div></li>
+            <li><div><b>Biblioteca com 10 materiais prontos</b><span>Contratos, procuração, petições, planilha, artes e roteiros</span></div></li>
             <li><div><b>28 episódios de leitura interativa</b><span>Casos práticos, checklists e kits prontos para usar</span></div></li>
             <li><div><b>Mais de 200 questões comentadas</b><span>Cada uma com a explicação e o artigo de lei</span></div></li>
             <li><div><b>7 desafios finais com certificado</b><span>Aprovação com 70% de acerto</span></div></li>
@@ -473,6 +551,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
       <div class="faq">
         <details><summary>Tem vídeo?</summary><p>Não. Todo o conteúdo é em leitura interativa, com telas curtas, casos práticos, checklists e questões. Você estuda em qualquer lugar, até sem fone de ouvido.</p></details>
         <details><summary>Serve para quem ainda está na faculdade?</summary><p>Sim. O conteúdo foi pensado para estudantes dos últimos anos e para quem acabou de ser aprovado na OAB.</p></details>
+        <details><summary>Quais materiais vêm na biblioteca?</summary><p>Modelo de contrato de honorários e de procuração (já disponíveis para copiar e editar na plataforma), contrato de parceria entre advogados, modelos de petições iniciais, planilha de controle financeiro, dezenas de artes para Instagram, 25 reels, 5 posts “Sobre mim”, 25 posts motivacionais e 25 roteiros de vídeo. Os itens que ainda não estão prontos entram na biblioteca ao longo da assinatura, sem custo adicional.</p></details>
         <details><summary>Como recebo o acesso?</summary><p>Logo após a confirmação do pagamento, você recebe por e-mail os dados para entrar na plataforma. No Pix, a liberação costuma ser imediata.</p></details>
         <details><summary>Tem fidelidade? Como cancelo?</summary><p>Não tem fidelidade. Você cancela a assinatura quando quiser, direto na plataforma de pagamento, e não há novas cobranças.</p></details>
         <details><summary>Quanto tempo leva cada temporada?</summary><p>Cerca de 1 hora a 1 hora e 20 minutos, somando leitura, questões e desafio final. Você pode pausar e continuar de onde parou.</p></details>
@@ -488,7 +567,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
       <h2>Tiro a sua insegurança <span class="it">jurídica</span></h2>
       <p>O primeiro episódio leva 15 minutos. Comece hoje e chegue à próxima consulta sabendo o que fazer.</p>
       <a class="btn btn-ink btn-xl" data-checkout href="#oferta">Quero assinar por R$ 24,90/mês <span class="arr">→</span></a>
-      <div class="micro"><span>Acesso imediato</span><span>Cancele quando quiser</span><span>7 dias de garantia</span></div>
+      <div class="micro"><span>Acesso imediato</span><span>Biblioteca de modelos inclusa</span><span>Cancele quando quiser</span><span>7 dias de garantia</span></div>
     </div>
   </section>
 </main>
