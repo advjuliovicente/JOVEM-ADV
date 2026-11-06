@@ -286,7 +286,9 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
 .doc p{margin:0 0 10px}
 .doc mark{background:#d6f9e6;color:#0b5c34;border-radius:4px;padding:0 3px;font-weight:600}
 .doc .stk{position:absolute;bottom:18px;right:18px;z-index:2;transform:rotate(-5deg)}
-.mtiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.mtiles{display:grid;grid-template-columns:repeat(20,minmax(0,1fr));gap:12px}
+.mtile{grid-column:span 4}
+.mtile.mk{grid-column:span 5}
 .mtile{position:relative;overflow:hidden;border-radius:18px;padding:16px;min-height:178px;display:flex;flex-direction:column;gap:6px;border:2px solid transparent;transition:transform .2s}
 .mtile:hover{transform:translateY(-5px) rotate(-1deg)}
 .mtile .mcat{font-family:var(--mono);font-size:10px;letter-spacing:1px;font-weight:700;text-transform:uppercase;opacity:.75}
@@ -304,15 +306,19 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
 .mtile.has-art .mst:not(.ok){background:color-mix(in srgb,currentColor 14%,transparent)}
 .mtile.v-k.has-art .mst:not(.ok){background:var(--surface2);color:var(--ink)}
 .mart{position:relative;display:block;margin:auto -16px 0;aspect-ratio:3/2;max-width:none}
-.mart img{position:relative;display:block;width:100%;height:100%;max-width:100%;object-fit:contain;object-position:50% 100%;transform-origin:50% 100%;transition:transform .35s ease}
-.mart.solto{padding:12px 18px 14px}
+.mart img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:100%;object-fit:contain;object-position:50% 100%;transform-origin:50% 100%;transition:transform .35s ease}
+.mart.solto img{inset:12px 18px 14px;width:auto;height:auto;max-width:calc(100% - 36px);max-height:calc(100% - 26px);margin:auto}
 .mart.solto img{filter:drop-shadow(0 12px 14px rgba(0,0,0,.28))}
+.mtile.mk .mart{aspect-ratio:16/10}
+.mart.post img{inset:14px 22px 16px;max-width:calc(100% - 44px);max-height:calc(100% - 30px)}
+.mart.post img{transform:rotate(-4deg)}
+.mtile.has-art:hover .mart.post img{transform:rotate(-2deg) scale(1.05)}
 .v-k .mart::before{content:"";position:absolute;left:12%;right:12%;top:18%;bottom:0;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--green) 34%,transparent),transparent);filter:blur(6px)}
 .mtile.has-art:hover .mart img{transform:scale(1.05)}
 @media (prefers-reduced-motion:reduce){.mart img{transition:none}.mtile.has-art:hover .mart img{transform:none}}
-@media (max-width:1000px){.mtiles{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:1000px){.mtiles{grid-template-columns:repeat(3,minmax(0,1fr))}.mtile,.mtile.mk{grid-column:auto}}
 @media (max-width:860px){.lib-head{grid-template-columns:1fr}.lib .bonus{top:16px;right:16px}}
-@media (max-width:560px){.mtiles{grid-template-columns:repeat(2,1fr)}.mtile{min-height:150px}.mtile b{font-size:16px;overflow-wrap:break-word;hyphens:manual}.lib .bonus{position:static;display:inline-block;margin-bottom:14px;font-size:20px}}
+@media (max-width:560px){.mtiles{grid-template-columns:repeat(2,minmax(0,1fr))}.mtile:last-child{grid-column:1 / -1}.mtile:last-child .mart{aspect-ratio:2/1}.mtile{min-height:150px}.mtile{padding:14px}.mtile b{font-size:15px;overflow-wrap:break-word;hyphens:manual}.mart{margin-left:-14px;margin-right:-14px}.lib .bonus{position:static;display:inline-block;margin-bottom:14px;font-size:20px}}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -394,7 +400,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
         <div class="stat"><b>7</b><span>temporadas completas</span></div>
         <div class="stat"><b>28</b><span>episódios de prática</span></div>
         <div class="stat"><b>200+</b><span>questões comentadas</span></div>
-        <div class="stat"><b>10</b><span>materiais bônus na biblioteca</span></div>
+        <div class="stat"><b>9</b><span>materiais bônus na biblioteca</span></div>
       </div>
     </div>
   </section>
@@ -431,11 +437,10 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
           <div class="mtile v-k has-art"><span class="mcat">Documentos</span><b>Contrato de parceria entre advogados</b><span class="mq">1 modelo</span><span class="mst">Chegando</span><span class="mart sangra"><img src="parceria.webp" width="720" height="479" loading="lazy" decoding="async" alt="Dois advogados apertando as mãos sobre um contrato"></span></div>
           <div class="mtile v-y has-art"><span class="mcat">Petições</span><b>Modelos de petições iniciais persuasivas</b><span class="mq">Pacote de modelos</span><span class="mst">Chegando</span><span class="mart sangra"><img src="peticao.webp" width="720" height="396" loading="lazy" decoding="async" alt="Folha de petição inicial persuasiva sobre a mesa de um escritório"></span></div>
           <div class="mtile v-g has-art"><span class="mcat">Gestão</span><b>Planilha de controle financeiro advocatício</b><span class="mq">1 planilha</span><span class="mst">Chegando</span><span class="mart solto"><img src="planilha.webp" width="720" height="460" loading="lazy" decoding="async" alt="Monitor com a planilha de controle financeiro e fluxo de caixa aberta"></span></div>
-          <div class="mtile v-p"><span class="mcat">Marketing</span><b>Dezenas de artes para Instagram</b><span class="mq">Dezenas de artes</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">@</span></div>
-          <div class="mtile v-k"><span class="mcat">Marketing</span><b>25 reels com conteúdo jurídico</b><span class="mq">25 reels</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">▶︎</span></div>
-          <div class="mtile v-y"><span class="mcat">Marketing</span><b>5 posts “Sobre mim”</b><span class="mq">5 posts</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✶</span></div>
-          <div class="mtile v-g"><span class="mcat">Marketing</span><b>25 posts motivacionais</b><span class="mq">25 posts</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✺</span></div>
-          <div class="mtile v-k"><span class="mcat">Marketing</span><b>25 roteiros de vídeo com CTA</b><span class="mq">25 roteiros</span><span class="mst ">Chegando</span><span class="g" aria-hidden="true">✎</span></div>
+          <div class="mtile v-p has-art mk"><span class="mcat">Marketing</span><b>Dezenas de artes para Instagram</b><span class="mq">Dezenas de artes</span><span class="mst">Chegando</span><span class="mart solto"><img src="artes.webp" width="610" height="503" loading="lazy" decoding="async" alt="Mosaico de posts de Instagram sobre Direito Empresarial"></span></div>
+          <div class="mtile v-y has-art mk"><span class="mcat">Marketing</span><b>5 posts “Sobre mim”</b><span class="mq">5 posts</span><span class="mst">Chegando</span><span class="mart solto post"><img src="sobremim.webp" width="520" height="644" loading="lazy" decoding="async" alt="Post “Sobre mim” com a foto de Julio Vicente e seus destaques"></span></div>
+          <div class="mtile v-g has-art mk"><span class="mcat">Marketing</span><b>25 posts motivacionais</b><span class="mq">25 posts</span><span class="mst">Chegando</span><span class="mart solto post"><img src="motivacional.webp" width="640" height="388" loading="lazy" decoding="async" alt="Post com frase motivacional no estilo de tweet"></span></div>
+          <div class="mtile v-k has-art mk"><span class="mcat">Marketing</span><b>25 roteiros de vídeo com CTA</b><span class="mq">25 roteiros</span><span class="mst">Chegando</span><span class="mart solto"><img src="roteiros.webp" width="618" height="285" loading="lazy" decoding="async" alt="Três modelos de roteiro: texto corrido, técnico e em cinco colunas"></span></div>
         </div>
         <div class="lib-foot">
           <p>Os itens marcados como disponível já estão na plataforma. Os demais entram na biblioteca ao longo da assinatura, sem custo adicional.</p>
@@ -503,7 +508,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
           <h3>O que você recebe</h3>
           <ul>
             <li><div><b>As 7 temporadas completas</b><span>Do Diploma à OAB Ativa até Mentalidade & Carreira</span></div></li>
-            <li><div><b>Biblioteca com 10 materiais prontos</b><span>Contratos, procuração, petições, planilha, artes e roteiros</span></div></li>
+            <li><div><b>Biblioteca com 9 materiais prontos</b><span>Contratos, procuração, petições, planilha, artes e roteiros</span></div></li>
             <li><div><b>28 episódios de leitura interativa</b><span>Casos práticos, checklists e kits prontos para usar</span></div></li>
             <li><div><b>Mais de 200 questões comentadas</b><span>Cada uma com a explicação e o artigo de lei</span></div></li>
             <li><div><b>7 desafios finais com certificado</b><span>Aprovação com 70% de acerto</span></div></li>
@@ -563,7 +568,7 @@ footer .wrap{display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between;
       <div class="faq">
         <details><summary>Tem vídeo?</summary><p>Não. Todo o conteúdo é em leitura interativa, com telas curtas, casos práticos, checklists e questões. Você estuda em qualquer lugar, até sem fone de ouvido.</p></details>
         <details><summary>Serve para quem ainda está na faculdade?</summary><p>Sim. O conteúdo foi pensado para estudantes dos últimos anos e para quem acabou de ser aprovado na OAB.</p></details>
-        <details><summary>Quais materiais vêm na biblioteca?</summary><p>Modelo de contrato de honorários e de procuração (já disponíveis para copiar e editar na plataforma), contrato de parceria entre advogados, modelos de petições iniciais, planilha de controle financeiro, dezenas de artes para Instagram, 25 reels, 5 posts “Sobre mim”, 25 posts motivacionais e 25 roteiros de vídeo. Os itens que ainda não estão prontos entram na biblioteca ao longo da assinatura, sem custo adicional.</p></details>
+        <details><summary>Quais materiais vêm na biblioteca?</summary><p>Modelo de contrato de honorários e de procuração (já disponíveis para copiar e editar na plataforma), contrato de parceria entre advogados, modelos de petições iniciais, planilha de controle financeiro, dezenas de artes para Instagram, 5 posts “Sobre mim”, 25 posts motivacionais e 25 roteiros de vídeo. Os itens que ainda não estão prontos entram na biblioteca ao longo da assinatura, sem custo adicional.</p></details>
         <details><summary>Como recebo o acesso?</summary><p>Logo após a confirmação do pagamento, você recebe por e-mail os dados para entrar na plataforma. No Pix, a liberação costuma ser imediata.</p></details>
         <details><summary>Tem fidelidade? Como cancelo?</summary><p>Não tem fidelidade. Você cancela a assinatura quando quiser, direto na plataforma de pagamento, e não há novas cobranças.</p></details>
         <details><summary>Quanto tempo leva cada temporada?</summary><p>Cerca de 1 hora a 1 hora e 20 minutos, somando leitura, questões e desafio final. Você pode pausar e continuar de onde parou.</p></details>
